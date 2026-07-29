@@ -1,17 +1,19 @@
 package main
 
 import ("bufio"
+		"encoding/json"
 		"fmt"
 		"os"
 		"strings"
-		"strconv")
+		"strconv"
+		)
 
 var reader = bufio.NewReader(os.Stdin)
 
 type Mission struct {
-	ID        int
-	Title     string
-	Completed bool
+	ID        int		`json:"id"`
+	Title     string 	`json:"title"`
+	Completed bool 		`json:"completed"`
 }
 func readLine(prompt string) string {
 	fmt.Print(prompt)
@@ -28,6 +30,18 @@ func readInt(prompt string) (int, error) {
 		fmt.Println("Invalid input. Please enter a valid integer.")
 	}
 }
+func saveMissionsToFile(missions []Mission) {
+	data, err := json.MarshalIndent(missions, "", "  ")
+	if err != nil {
+		fmt.Println("Error encoding missions:", err)
+		return
+	}
+	if err:= os.WriteFile("missions.json", data, 0644); err != nil {
+		fmt.Println("Error writing missions to file:", err)
+	}
+}
+
+
 
 func main() {
 	missions := []Mission{}
@@ -52,9 +66,7 @@ func main() {
 
 		switch choice {
 		case 1:
-			var title string
-			fmt.Print("Enter mission title: ")
-			title = readLine("")
+			title := readLine("Enter mission title: ")
 			newMission := Mission{
 				ID: len(missions) + 1,
 				Title: title,
