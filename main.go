@@ -41,15 +41,21 @@ func saveMissionsToFile(missions []Mission) {
 	}
 }
 
+func loadMissionsFromFile() []Mission {
+	data, err := os.ReadFile("missions.json")
+	if err != nil {
+		fmt.Println("Error reading missions from file:", err)
+		return []Mission{}
+	}
+	var missions []Mission
+	json.Unmarshal(data, &missions)
+	return missions
+}
+
 
 
 func main() {
-	missions := []Mission{}
-	missions = append(missions, Mission{ID: 1, Title: "Mission 1", Completed: false})
-	missions = append(missions, Mission{ID: 2, Title: "Mission 2", Completed: true})
-	missions = append(missions, Mission{ID: 3, Title: "Mission 3", Completed: false})
-
-
+	missions := loadMissionsFromFile()
 
 	for {
 		fmt.Println("1. Add Mission")
@@ -73,6 +79,7 @@ func main() {
 				Completed: false,
 			}
 			missions = append(missions, newMission)
+			saveMissionsToFile(missions)
 			fmt.Println("Mission added successfully!")
 		case 2:
 			fmt.Println("Missions:")
@@ -90,16 +97,24 @@ func main() {
 				continue
 			}
 			found := false
+			changed := false
 			for i := range missions {
 				if missions[i].ID == id {
-					missions[i].Completed = true
-					fmt.Println("Mission marked as completed!")
 					found = true
+					if missions[i].Completed {
+						fmt.Println("Mission is already completed!")
+					} else {
+						missions[i].Completed = true
+						fmt.Println("Mission marked as completed!")
+						changed = true
+					}
 					break
 				}
 			}
 			if !found {
 				fmt.Println("Invalid mission ID")
+			} else if changed {
+				saveMissionsToFile(missions)
 			}
 		case 4:
 			fmt.Println("Exiting...")
