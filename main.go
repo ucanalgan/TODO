@@ -56,13 +56,22 @@ func loadMissionsFromFile() []Mission {
 
 func main() {
 	missions := loadMissionsFromFile()
+	nextID := 1
+	for _, m := range missions {
+		if m.ID >= nextID {
+			nextID = m.ID + 1
+		}
+	}
+
 
 	for {
 		fmt.Println("1. Add Mission")
 		fmt.Println("2. List Missions")
 		fmt.Println("3. Complete Mission")
-		fmt.Println("4. Exit")
-		
+		fmt.Println("4. Delete Mission")
+		fmt.Println("5. Edit Mission")
+		fmt.Println("6. Exit")
+
 		choice,err := readInt("Enter your choice: ")
 		if err != nil {
 			fmt.Println("Invalid input. Please enter a valid integer.")
@@ -74,11 +83,12 @@ func main() {
 		case 1:
 			title := readLine("Enter mission title: ")
 			newMission := Mission{
-				ID: len(missions) + 1,
+				ID: nextID,
 				Title: title,
 				Completed: false,
 			}
 			missions = append(missions, newMission)
+			nextID++
 			saveMissionsToFile(missions)
 			fmt.Println("Mission added successfully!")
 		case 2:
@@ -117,6 +127,47 @@ func main() {
 				saveMissionsToFile(missions)
 			}
 		case 4:
+			id,err := readInt("Enter mission ID to delete: ")
+			if err != nil {
+				fmt.Println("Invalid input. Please enter a valid integer.")
+				continue
+			}
+			found := false
+			for i := range missions {
+				if missions[i].ID == id {
+					found = true
+					missions = append(missions[:i], missions[i+1:]...)
+					fmt.Println("Mission deleted successfully!")
+					break
+				}
+			}
+			if !found {
+				fmt.Println("Invalid mission ID")
+			} else {
+				saveMissionsToFile(missions)
+			}
+		case 5:
+			id,err := readInt("Enter mission ID to edit: ")
+			if err != nil {
+				fmt.Println("Invalid input. Please enter a valid integer.")
+				continue
+			}
+			found := false
+			for i := range missions {
+				if missions[i].ID == id {
+					found = true
+					title := readLine("Enter new mission title: ")
+					missions[i].Title = title
+					fmt.Println("Mission edited successfully!")
+					break
+				}
+			}
+			if !found {
+				fmt.Println("Invalid mission ID")
+			} else {
+				saveMissionsToFile(missions)
+			}
+		case 6:
 			fmt.Println("Exiting...")
 			return
 		default:
