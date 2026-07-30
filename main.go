@@ -1,20 +1,22 @@
 package main
 
-import ("bufio"
-		"encoding/json"
-		"fmt"
-		"os"
-		"strings"
-		"strconv"
-		)
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
 
 var reader = bufio.NewReader(os.Stdin)
 
 type Mission struct {
-	ID        int		`json:"id"`
-	Title     string 	`json:"title"`
-	Completed bool 		`json:"completed"`
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
 }
+
 func readLine(prompt string) string {
 	fmt.Print(prompt)
 	line, _ := reader.ReadString('\n')
@@ -36,7 +38,7 @@ func saveMissionsToFile(missions []Mission) {
 		fmt.Println("Error encoding missions:", err)
 		return
 	}
-	if err:= os.WriteFile("missions.json", data, 0644); err != nil {
+	if err := os.WriteFile("missions.json", data, 0644); err != nil {
 		fmt.Println("Error writing missions to file:", err)
 	}
 }
@@ -44,15 +46,20 @@ func saveMissionsToFile(missions []Mission) {
 func loadMissionsFromFile() []Mission {
 	data, err := os.ReadFile("missions.json")
 	if err != nil {
-		fmt.Println("Error reading missions from file:", err)
+		if os.IsNotExist(err) {
+			fmt.Println("missions.json file not found. Starting with an empty mission list.")
+		} else {
+			fmt.Println("Error reading missions from file:", err)
+		}
 		return []Mission{}
 	}
 	var missions []Mission
-	json.Unmarshal(data, &missions)
+	if err := json.Unmarshal(data, &missions); err != nil {
+		fmt.Println("Error decoding missions:", err)
+		return []Mission{}
+	}
 	return missions
 }
-
-
 
 func main() {
 	missions := loadMissionsFromFile()
@@ -63,7 +70,6 @@ func main() {
 		}
 	}
 
-
 	for {
 		fmt.Println("1. Add Mission")
 		fmt.Println("2. List Missions")
@@ -72,25 +78,28 @@ func main() {
 		fmt.Println("5. Edit Mission")
 		fmt.Println("6. Exit")
 
-		choice,err := readInt("Enter your choice: ")
+		choice, err := readInt("Enter your choice: ")
 		if err != nil {
 			fmt.Println("Invalid input. Please enter a valid integer.")
 			continue
 		}
 
-
 		switch choice {
 		case 1:
 			title := readLine("Enter mission title: ")
 			newMission := Mission{
-				ID: nextID,
-				Title: title,
+				ID:        nextID,
+				Title:     title,
 				Completed: false,
 			}
-			missions = append(missions, newMission)
-			nextID++
-			saveMissionsToFile(missions)
-			fmt.Println("Mission added successfully!")
+			if title == "" {
+				fmt.Println("Mission title cannot be empty!")
+			} else {
+				missions = append(missions, newMission)
+				nextID++
+				saveMissionsToFile(missions)
+				fmt.Println("Mission added successfully!")
+			}
 		case 2:
 			fmt.Println("Missions:")
 			for _, m := range missions {
@@ -101,7 +110,7 @@ func main() {
 				fmt.Printf("Mission ID: %d, Title: %s, Status: %s\n", m.ID, m.Title, status)
 			}
 		case 3:
-			id,err := readInt("Enter mission ID to complete: ")
+			id, err := readInt("Enter mission ID to complete: ")
 			if err != nil {
 				fmt.Println("Invalid input. Please enter a valid integer.")
 				continue
@@ -127,7 +136,7 @@ func main() {
 				saveMissionsToFile(missions)
 			}
 		case 4:
-			id,err := readInt("Enter mission ID to delete: ")
+			id, err := readInt("Enter mission ID to delete: ")
 			if err != nil {
 				fmt.Println("Invalid input. Please enter a valid integer.")
 				continue
@@ -147,24 +156,30 @@ func main() {
 				saveMissionsToFile(missions)
 			}
 		case 5:
-			id,err := readInt("Enter mission ID to edit: ")
+			id, err := readInt("Enter mission ID to edit: ")
 			if err != nil {
 				fmt.Println("Invalid input. Please enter a valid integer.")
 				continue
 			}
 			found := false
+			changed := false
 			for i := range missions {
 				if missions[i].ID == id {
 					found = true
 					title := readLine("Enter new mission title: ")
-					missions[i].Title = title
-					fmt.Println("Mission edited successfully!")
+					if title == "" {
+						fmt.Println("Mission title cannot be empty!")
+					} else {
+						missions[i].Title = title
+						changed = true
+						fmt.Println("Mission edited successfully!")
+					}
 					break
 				}
 			}
 			if !found {
 				fmt.Println("Invalid mission ID")
-			} else {
+			} else if changed {
 				saveMissionsToFile(missions)
 			}
 		case 6:
