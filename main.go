@@ -42,14 +42,22 @@ func main() {
 				fmt.Println("Mission added successfully!")
 			}
 		case 2:
+			completedCount := 0
+			if len(missions) == 0 {
+				fmt.Println("No missions found!")
+				continue
+			}
 			fmt.Println("Missions:")
 			for _, m := range missions {
 				status := "Completed"
-				if !m.Completed {
+				if m.Completed {
+					completedCount++
+				} else {
 					status = "Incomplete"
 				}
 				fmt.Printf("Mission ID: %d, Title: %s, Status: %s\n", m.ID, m.Title, status)
 			}
+			fmt.Printf("Total Missions: %d, Completed: %d, Incomplete: %d\n", len(missions), completedCount, len(missions)-completedCount)
 		case 3:
 			id, err := readInt("Enter mission ID to complete: ")
 			if err != nil {
