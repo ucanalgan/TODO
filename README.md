@@ -1,20 +1,20 @@
 # TODO
 
-Terminal üzerinden çalışan, Go ile yazılmış basit bir görev yöneticisi. Görevler JSON dosyasına kaydedilir, program kapanıp açıldığında kaldığı yerden devam eder.
+A simple terminal-based task manager written in Go. Tasks are saved to a JSON file, so the program picks up where it left off after being closed and reopened.
 
-## Özellikler
+## Features
 
-- Görev ekleme, listeleme, düzenleme ve silme
-- Görevleri tamamlandı olarak işaretleme
-- Silme işleminde onay sorusu
-- JSON dosyasına otomatik kayıt her değişiklik anında yazılır
-- Renkli durum göstergesi (tamamlanan yeşil, bekleyen sarı)
-- Listede toplam / tamamlanan / bekleyen sayısı
-- Geçersiz girdilere karşı doğrulama (boş başlık, hatalı ID, sayı olmayan menü seçimi)
+- Add, list, edit, and delete tasks
+- Mark tasks as completed
+- Confirmation prompt before deletion
+- Automatic JSON persistence — every change is written immediately
+- Color-coded status (completed in green, pending in yellow)
+- Total / completed / pending counts in the list view
+- Input validation (empty titles, invalid IDs, non-numeric menu choices)
 
-## Kurulum
+## Installation
 
-Go 1.26 veya üzeri gerekir.
+Requires Go 1.26 or later.
 
 ```bash
 git clone https://github.com/ucanalgan/TODO.git
@@ -22,17 +22,17 @@ cd TODO
 go run .
 ```
 
-Derlenmiş bir çalıştırılabilir dosya oluşturmak için:
+To build an executable:
 
 ```bash
 go build .
 ```
 
-> `go run main.go` çalışmaz proje birden fazla dosyaya bölündüğü için tüm paketi derleyen `go run .` kullanılmalıdır.
+> `go run main.go` will not work — the project is split across multiple files, so use `go run .` to compile the whole package.
 
-## Kullanım
+## Usage
 
-Program açıldığında menü görünür:
+The menu appears when the program starts:
 
 ```
 1. Add Mission
@@ -44,31 +44,31 @@ Program açıldığında menü görünür:
 Enter your choice:
 ```
 
-Örnek bir listeleme çıktısı:
+Sample list output:
 
 ```
 Missions:
-Mission ID: 1, Title: Go dokümantasyonunu oku, Status: Completed
-Mission ID: 2, Title: README yaz, Status: Incomplete
+Mission ID: 1, Title: Read the Go documentation, Status: Completed
+Mission ID: 2, Title: Write the README, Status: Incomplete
 Total Missions: 2, Completed: 1, Incomplete: 1
 ```
 
-Görevler çalışma dizinindeki `missions.json` dosyasında tutulur. Dosya yoksa program boş bir listeyle başlar ve ilk görev eklendiğinde dosyayı oluşturur.
+Tasks are stored in `missions.json` in the working directory. If the file does not exist, the program starts with an empty list and creates it when the first task is added.
 
-## Proje Yapısı
+## Project Structure
 
 ```
 .
-├── main.go       # Menü döngüsü ve komut yönlendirmesi
-├── mission.go    # Mission veri modeli
-├── input.go      # Terminal girdisi okuma ve doğrulama
-├── storage.go    # JSON dosyasına kaydetme ve okuma
-└── missions.json # Görev verisi (otomatik oluşur, sürüm kontrolüne dahil değil)
+├── main.go       # Menu loop and command dispatch
+├── mission.go    # Mission data model
+├── input.go      # Terminal input reading and validation
+├── storage.go    # Saving to and loading from JSON
+└── missions.json # Task data (created automatically, not tracked in version control)
 ```
 
-Dört dosya da `package main` altındadır; ayrı paket bölünmesi bu boyuttaki bir proje için gereksiz görülmüştür.
+All four files belong to `package main`; splitting into separate packages was considered unnecessary for a project of this size.
 
-### Veri modeli
+### Data model
 
 ```go
 type Mission struct {
@@ -78,19 +78,19 @@ type Mission struct {
 }
 ```
 
-ID'ler program başlarken mevcut en yüksek ID'nin bir fazlasından devam eder; bu sayede silme işleminden sonra ID çakışması oluşmaz.
+IDs continue from one above the highest existing ID at startup, which prevents ID collisions after a deletion.
 
-## Bilinen sınırlamalar
+## Known Limitations
 
-- Görev başlıkları tek satırlıdır
-- Silinen bir görev geri alınamaz (silmeden önce onay sorulur)
-- Aynı anda birden fazla program örneği çalıştırılırsa dosya yazımları çakışabilir
+- Task titles are single-line only
+- Deleted tasks cannot be recovered (a confirmation is requested before deleting)
+- Concurrent instances of the program may conflict when writing to the file
 
-## Yol haritası
+## Roadmap
 
-- [ ] Öncelik alanı ve önceliğe göre sıralama
-- [ ] Tamamlananları gizleme / filtreleme
-- [ ] Başlığa göre arama
-- [ ] Oluşturulma tarihi
-- [ ] Menü yerine CLI komutları (`todo add`, `todo list`)
-- [ ] Birim testleri
+- [ ] Priority field and sorting by priority
+- [ ] Hiding / filtering completed tasks
+- [ ] Search by title
+- [ ] Creation timestamp
+- [ ] CLI commands instead of a menu (`todo add`, `todo list`)
+- [ ] Unit tests
