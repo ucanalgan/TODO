@@ -7,7 +7,7 @@ Terminal üzerinden çalışan, Go ile yazılmış basit bir görev yöneticisi.
 - Görev ekleme, listeleme, düzenleme ve silme
 - Görevleri tamamlandı olarak işaretleme
 - Silme işleminde onay sorusu
-- JSON dosyasına otomatik kayıt — her değişiklik anında yazılır
+- JSON dosyasına otomatik kayıt her değişiklik anında yazılır
 - Renkli durum göstergesi (tamamlanan yeşil, bekleyen sarı)
 - Listede toplam / tamamlanan / bekleyen sayısı
 - Geçersiz girdilere karşı doğrulama (boş başlık, hatalı ID, sayı olmayan menü seçimi)
@@ -28,7 +28,7 @@ Derlenmiş bir çalıştırılabilir dosya oluşturmak için:
 go build .
 ```
 
-> `go run main.go` çalışmaz — proje birden fazla dosyaya bölündüğü için tüm paketi derleyen `go run .` kullanılmalıdır.
+> `go run main.go` çalışmaz proje birden fazla dosyaya bölündüğü için tüm paketi derleyen `go run .` kullanılmalıdır.
 
 ## Kullanım
 
