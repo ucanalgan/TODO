@@ -97,17 +97,24 @@ func main() {
 				continue
 			}
 			found := false
+			deleted := false
 			for i := range missions {
 				if missions[i].ID == id {
 					found = true
-					missions = append(missions[:i], missions[i+1:]...)
-					fmt.Println("Mission deleted successfully!")
+					confirm := readLine("Are you sure you want to delete this mission? (y/n): ")
+					if confirm == "y" || confirm == "Y" {
+						missions = append(missions[:i], missions[i+1:]...)
+						fmt.Println("Mission deleted successfully!")
+						deleted = true
+					} else {
+						fmt.Println("Mission deletion canceled.")
+					}
 					break
 				}
 			}
 			if !found {
 				fmt.Println("Invalid mission ID")
-			} else {
+			} else if deleted {
 				saveMissionsToFile(missions)
 			}
 		case 5:
