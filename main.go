@@ -1,65 +1,6 @@
 package main
 
-import (
-	"bufio"
-	"encoding/json"
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
-)
-
-var reader = bufio.NewReader(os.Stdin)
-
-type Mission struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	Completed bool   `json:"completed"`
-}
-
-func readLine(prompt string) string {
-	fmt.Print(prompt)
-	line, _ := reader.ReadString('\n')
-	return strings.TrimSpace(line)
-}
-func readInt(prompt string) (int, error) {
-	for {
-		input := readLine(prompt)
-		value, err := strconv.Atoi(input)
-		if err == nil {
-			return value, nil
-		}
-		fmt.Println("Invalid input. Please enter a valid integer.")
-	}
-}
-func saveMissionsToFile(missions []Mission) {
-	data, err := json.MarshalIndent(missions, "", "  ")
-	if err != nil {
-		fmt.Println("Error encoding missions:", err)
-		return
-	}
-	if err := os.WriteFile("missions.json", data, 0644); err != nil {
-		fmt.Println("Error writing missions to file:", err)
-	}
-}
-
-func loadMissionsFromFile() []Mission {
-	data, err := os.ReadFile("missions.json")
-	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("missions.json file not found. Starting with an empty mission list.")
-		} else {
-			fmt.Println("Error reading missions from file:", err)
-		}
-		return []Mission{}
-	}
-	var missions []Mission
-	if err := json.Unmarshal(data, &missions); err != nil {
-		fmt.Println("Error decoding missions:", err)
-		return []Mission{}
-	}
-	return missions
-}
+import "fmt"
 
 func main() {
 	missions := loadMissionsFromFile()
