@@ -2,6 +2,12 @@ package main
 
 import "fmt"
 
+const (
+	colorReset  = "\033[0m"
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+)
+
 func main() {
 	missions := loadMissionsFromFile()
 	nextID := 1
@@ -49,11 +55,11 @@ func main() {
 			}
 			fmt.Println("Missions:")
 			for _, m := range missions {
-				status := "Completed"
+				status := colorGreen + "Completed" + colorReset
 				if m.Completed {
 					completedCount++
 				} else {
-					status = "Incomplete"
+					status = colorYellow + "Incomplete" + colorReset
 				}
 				fmt.Printf("Mission ID: %d, Title: %s, Status: %s\n", m.ID, m.Title, status)
 			}
